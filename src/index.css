@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@plugin './hero.js';
+/* Note: You may need to change the path to fit your project structure */
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+html,
+body {
+  font-family: "Montserrat", sans-serif;
+}
+.container {
+  @apply mx-auto;
+  @apply max-w-11/12;
+  /* @apply px-4;
+  @apply sm:px-6;
+  @apply lg:px-8; */
+}
+.section-padding {
+  @apply px-4 sm:px-6 lg:px-8;
+}
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  
+}
+.container-wide {
+  @apply mx-auto;
+  @apply w-full;
+  @apply px-4 sm:px-6 lg:px-8;
+}
