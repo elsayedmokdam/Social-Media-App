@@ -2,30 +2,36 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { $HOOKS_REPOSITORY } from "../../../hooks/hooks_repository";
 import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
+import { $Services } from "../../../services/services-repository";
+import { useState } from "react";
 
 export default function SuggestionsCard({ suggestions }) {
   const { followersCount, mutualFollowersCount, name, photo, username, _id } =
     suggestions;
   const { userProfile } = $HOOKS_REPOSITORY.useAuth();
-  console.log("userProfile", userProfile);
-  console.log("suggestions", suggestions);
+  let [isFollowing, setIsFollowing] = useState(false);
 
   const queryClient = useQueryClient();
   const followUserMutation = useMutation({
     mutationFn: (_id) => $Services.USER_REPOSITORY.followUnfollowUser(_id),
-    onSuccess: () =>
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: $QUERY_KEYS.profile.myProfile,
-      }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: $QUERY_KEYS.suggestionFriends,
+      });
+      queryClient.invalidateQueries({
+        queryKey: $QUERY_KEYS.searchSuggestions,
+      });
+      setIsFollowing(!isFollowing);
+    },
   });
 
   function followUnfollowHandler() {
     followUserMutation.mutate(_id);
-    // console.log("followUnfollowHandler");
   }
 
-  const isFollowing = userProfile?.following?.some((userId) => userId === _id);
-  console.log("isFollowing", isFollowing);
 
   return (
     <div className="flex flex-col gap-3 border border-neutral-200 rounded-xl p-3">
@@ -61,10 +67,10 @@ export default function SuggestionsCard({ suggestions }) {
       </div>
       <div className="flex items-center gap-2 font-semibold">
         <p className="text-xs text-gray-500 bg-gray-50 rounded-full px-3 py-1 w-fit">
-          {followersCount} followers
+          {followersCount || 0} followers
         </p>
         <p className="text-xs text-blue-500 bg-blue-50 rounded-full px-2 py-1 w-fit">
-          {mutualFollowersCount} mutual friends
+          {mutualFollowersCount || 0} mutual friends
         </p>
       </div>
     </div>
