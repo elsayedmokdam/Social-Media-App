@@ -6,9 +6,9 @@ import { useRef, useState } from "react";
 import { $Utilities } from "../../../utilities/utilities-repository";
 import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
 import { useMyProfile } from "../../../hooks/useMyProfile";
-import ProfileCoverModal from "../../modals/profileCoverModal";
 import ImageInFullScreen from "../images/ImageInFullScreen";
 import { $HOOKS_REPOSITORY } from "../../../hooks/hooks_repository";
+import ProfileCoverModal from "../../modals/ProfileCoverModal";
 
 export default function ProfileHeader() {
   const cover = useRef();
