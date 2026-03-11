@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router";
 import bgImage from "../../../assets/images/signup-bg-DGRfriy9.png";
-import image from "../../../assets/images/avatar-generations_rpge.jpg";
+import image from "../../../assets/images/me.jpg";
 import { Form, Input } from "@heroui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

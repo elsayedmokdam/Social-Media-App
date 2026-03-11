@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import bgImage from "../../../assets/images/signup-bg-DGRfriy9.png";
-import image from "../../../assets/images/avatar-generations_rpge.jpg";
+import image from "../../../assets/images/me.jpg";
 import {
   Button,
   DatePicker,
