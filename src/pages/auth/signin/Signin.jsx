@@ -10,6 +10,24 @@ import { useMutation } from "@tanstack/react-query";
 import { $Services } from "../../../services/services-repository";
 import { $Utilities } from "../../../utilities/utilities-repository";
 import { $Contexts } from "../../../context/context-repository";
+
+const appInfo = [
+  {
+    icon: <i className="fa-solid fa-users"></i>,
+    number: "2M+",
+    title: "Active Users",
+  },
+  {
+    icon: <i className="fa-solid fa-heart"></i>,
+    number: "10M+",
+    title: "Posts Shared",
+  },
+  {
+    icon: <i className="fa-solid fa-message"></i>,
+    number: "50M+",
+    title: "Message Sent",
+  },
+];
 export default function Signin() {
   const { setSocialAppToken } = $Contexts.useAuth();
 
@@ -117,54 +135,31 @@ export default function Signin() {
             </div>
 
             <div className="flex gap-5 md:gap-8 items-center my-8">
-              <div className="flex flex-col gap-1 text-white">
-                <div className="flex gap-2 items-center">
-                  <i className="fa-solid fa-users"></i>
-                  <h3 className="text-2xl font-bold">2M+</h3>
+              {appInfo.map((item) => (
+                <div className="flex flex-col gap-1 text-white">
+                  <div className="flex gap-2 items-center">
+                    {item.icon}
+                    <h3 className="text-2xl font-bold">{item.number}</h3>
+                  </div>
+                  <h3 className="text-lg text-center">{item.title}</h3>
                 </div>
-                <h3 className="text-lg text-center">Active Users</h3>
-              </div>
-
-              <div className="flex flex-col gap-1 text-white">
-                <div className="flex gap-2 items-center">
-                  <h3 className="text-2xl font-bold">10M+</h3>
-                </div>
-                <h3 className="text-lg text-center">Posts Shared</h3>
-              </div>
-
-              <div className="flex flex-col gap-1 text-white">
-                <div className="flex gap-2 items-center">
-                  <i className="fa-solid fa-message"></i>
-                  <h3 className="text-2xl font-bold">50M+</h3>
-                </div>
-                <h3 className="text-lg text-center">Message Sent</h3>
-              </div>
+              ))}
             </div>
 
             <div className="mt-8 rounded-xl bg-white/20 text-white border border-white/30 p-5 hover:bg-white/30 transition-background duration-300 backdrop-blur-lg">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-amber-200">
-                  <i className="fa-solid fa-star"></i>
-                </span>
-                <span className="text-amber-200">
-                  <i className="fa-solid fa-star"></i>
-                </span>
-                <span className="text-amber-200">
-                  <i className="fa-solid fa-star"></i>
-                </span>
-                <span className="text-amber-200">
-                  <i className="fa-solid fa-star"></i>
-                </span>
-                <span className="text-amber-200">
-                  <i className="fa-solid fa-star"></i>
-                </span>
+                {Array.from({ length: 5 }).map((_) => (
+                  <span className="text-amber-200">
+                    <i className="fa-solid fa-star"></i>
+                  </span>
+                ))}
               </div>
               <p className="text-md italic">
                 "SocialHub has completely changed how I connect with friends and
                 discover new communities. The experience is seamless!"
               </p>
               <div className="flex items-center gap-3 mt-4">
-                <div className="size-15 rounded-full border-2 border-white/50">
+                <div className="size-15 rounded-full border-2 border-white/50 hover:border-white hover:scale-150 transition-transform duration-300">
                   <img
                     src={image}
                     className="w-full rounded-full "
@@ -176,7 +171,7 @@ export default function Signin() {
                   <h2 className="text-md font-semibold text-white">
                     El-Sayed Mokdam
                   </h2>
-                  <p className="text-sm text-white/70">Product Designer</p>
+                  <p className="text-sm text-white/70">Software Engineer</p>
                 </div>
               </div>
             </div>
