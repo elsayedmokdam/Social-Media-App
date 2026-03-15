@@ -1,17 +1,20 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { $QUERY_KEYS } from "../../query-keys/queryKeys";
 import { $Services } from "../../services/services-repository";
 import { Button, Input, Tooltip } from "@heroui/react";
 import SuggestionsCard from "../../components/feed/feed-right-sidebar/SuggestionsCard";
 
 export default function SuggestionsPage() {
-  const [search, setSearch] = useState("");
+  const {state} = useLocation();
+  console.log("state", state);
+
+  const [search, setSearch] = useState(state?.search || "");
 
   const { register } = useForm({
-    defaultValues: { search: "" },
+    defaultValues: { search: search },
   });
 
   // Get suggested friends

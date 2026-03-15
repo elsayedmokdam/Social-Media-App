@@ -11,7 +11,7 @@ export default function FeedRightSideBar() {
   const [isOpenSuggestions, setIsOpenSuggestions] = useState(true);
   const [search, setSearch] = useState("");
 
-  const { register, reset } = useForm({
+  const { register } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
@@ -101,6 +101,7 @@ export default function FeedRightSideBar() {
       {suggestions?.length > 0 && (
         <Link
           to="/suggestions"
+          state={{ search }}
           className={`text-xs text-blue-500 font-bold cursor-pointer items-center justify-center bg-white border border-neutral-200 rounded-full py-2 mt-5 xl:flex ${isOpenSuggestions ? "flex" : "hidden"}`}
         >
           Show more
