@@ -1,14 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
-import { $HOOKS_REPOSITORY } from "../../../hooks/hooks_repository";
 import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
 import { $Services } from "../../../services/services-repository";
 import { useState } from "react";
+import avatarFallback from "../../../assets/images/avatar-generations_rpge.jpg";
 
 export default function SuggestionsCard({ suggestions }) {
   const { followersCount, mutualFollowersCount, name, photo, username, _id } =
     suggestions;
-  const { userProfile } = $HOOKS_REPOSITORY.useAuth();
   let [isFollowing, setIsFollowing] = useState(false);
 
   const queryClient = useQueryClient();
@@ -31,22 +30,27 @@ export default function SuggestionsCard({ suggestions }) {
   function followUnfollowHandler() {
     followUserMutation.mutate(_id);
   }
-
-
   return (
     <div className="flex flex-col gap-3 border border-neutral-200 rounded-xl p-3">
       <div className="flex items-center justify-between">
         <Link to={`/profile/${_id}`} className="flex items-center gap-2">
-          {" "}
           <div className="size-10">
-            <img className="w-10 h-10 rounded-full" src={photo} alt="avatar" />
+            <img
+              className="w-10 h-10 rounded-full"
+              src={photo || avatarFallback}
+              alt="avatar"
+              onError={(e) => (
+                (e.currentTarget.onerror = null),
+                (e.currentTarget.src = avatarFallback)
+              )}
+            />
           </div>
           <div>
             <p className="text-sm font-bold text-neutral-800 w-10 md:w-25 truncate hover:underline">
               {name}
             </p>
             <p className="text-xs text-neutral-400 w-10 md:w-20 truncate">
-              @{username}
+              {`${username ? `@${username}` : ""}`}
             </p>
           </div>
         </Link>

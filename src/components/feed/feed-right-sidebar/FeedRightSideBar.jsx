@@ -1,11 +1,11 @@
 import { Divider, Input } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
-import { $Services } from "../../../services/services-repository";
-import SuggestionsCard from "./SuggestionsCard";
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
-import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
 import { useState } from "react";
+import { $Services } from "../../../services/services-repository";
+import SuggestionsCard from "./SuggestionsCard";
+import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
 
 export default function FeedRightSideBar() {
   const [isOpenSuggestions, setIsOpenSuggestions] = useState(true);
@@ -23,28 +23,21 @@ export default function FeedRightSideBar() {
   const suggestedFriendsQuery = useQuery({
     queryFn: () =>
       $Services.USER_REPOSITORY.getFollowSuggestions({ limit: 10 }),
-      queryKey: ["suggested-friends", search],
+    queryKey: [$QUERY_KEYS.suggestionFriends, search],
   });
 
   // Get search suggested friends
   const searchSuggestedFriends = useQuery({
     queryFn: () => $Services.USER_REPOSITORY.searchSuggestions({ q: search }),
-    queryKey: $QUERY_KEYS.searchSuggestions,
+    queryKey: ["search-suggested-friends", search],
   });
-
-  // Handle search
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-    reset({ search: e.target.value });
-    searchSuggestedFriends.refetch();
-  };
 
   // Get suggestions
   const suggestions =
     search.length > 0
-      ? searchSuggestedFriends?.data?.data?.users
+      ? searchSuggestedFriends?.data?.data?.suggestions
       : suggestedFriendsQuery?.data?.data?.suggestions;
-    
+
   return (
     <div className="bg-white rounded-xl shadow-md p-3 sticky top-25">
       <div
@@ -69,11 +62,13 @@ export default function FeedRightSideBar() {
       <Input
         {...register("search")}
         onClear={() => setSearch("")}
-        onChange={handleSearch}
+        onChange={(e) => setSearch(e.target.value)}
         type="text"
+        size="md"
+        autoComplete="off"
         startContent={<i className="fa-solid fa-magnifying-glass"></i>}
         placeholder="Search friends..."
-        className={`my-3 border-1 border-neutral-200 rounded-xl outline-none hidden xl:flex ${isOpenSuggestions ? "flex" : "hidden"}`}
+        className={`my-3 border-1 border-neutral-200 rounded-xl outline-none hidden xl:flex overflow-hidden ${isOpenSuggestions ? "flex" : "hidden"}`}
       />
       <div>
         {suggestions?.length > 0 ? (

@@ -56,6 +56,8 @@ export default function SuggestionsPage() {
     return suggestedFriendsQuery.fetchNextPage();
   }
 
+  const activeQuery = search.length > 0 ? searchSuggestedFriends : suggestedFriendsQuery;
+
   return (
     <div
       className={`bg-gray-100 min-h-screen py-5 ${suggestedFriendsQuery.isLoading ? "blur-xs" : ""} ${searchSuggestedFriends.isLoading ? "animate-pulse" : ""}`}
@@ -100,14 +102,18 @@ export default function SuggestionsPage() {
           <Input
             {...register("search")}
             onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch("")}
             type="text"
+            size="md"
+            autoComplete="off"
             startContent={<i className="fa-solid fa-magnifying-glass"></i>}
-            placeholder="Search friends..."
-            className="my-5 border border-neutral-200 rounded-xl"
+            placeholder="Search for friends..."
+            className="my-5 border border-neutral-200 rounded-xl "
           />
 
           {/* Suggestions */}
           <div>
+            {/* If has suggestions */}
             {suggestions?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {suggestions.map((suggestion) => (
@@ -116,41 +122,44 @@ export default function SuggestionsPage() {
                     suggestions={suggestion}
                   />
                 ))}
-                {searchSuggestedFriends.hasNextPage ||
-                suggestedFriendsQuery.hasNextPage ? (
-                  <div className="col-span-1 md:col-span-2 lg:col-span-3  text-center">
+
+                {/* Load more if has next page */}
+                {activeQuery?.hasNextPage ? (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center">
                     <Button
                       onPress={getNextPage}
                       variant="ghost"
                       color="primary"
                     >
                       <span>Load More</span>
-                      {searchSuggestedFriends.isFetchingNextPage ||
-                        (suggestedFriendsQuery.isFetchingNextPage && (
-                          <i className="fa-solid fa-spinner animate-spin ms-3"></i>
-                        ))}
+
+                      {activeQuery?.isFetchingNextPage && (
+                        <i className="fa-solid fa-spinner animate-spin ms-3"></i>
+                      )}
                     </Button>
                   </div>
+                  // If no more suggestions
                 ) : (
-                  <div className="col-span-1 md:col-span-2 lg:col-span-3  text-center">
-                    <p className="text-xs text-neutral-500 text-center mt-10">
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center">
+                    <p className="text-xs text-neutral-500 font-semibold mt-10">
                       No more suggestions
                     </p>
                   </div>
                 )}
               </div>
+              // If no suggestions
             ) : (
-              <p className="text-xs text-neutral-500 text-center mt-10">
-                {suggestedFriendsQuery.isLoading ||
-                searchSuggestedFriends.isLoading ? (
-                  <>
+              <div className="text-xs text-neutral-500 font-semibold text-center mt-10">
+                {/* If loading */}
+                {activeQuery?.isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span>Loading Suggestions</span>
                     <i className="fa-solid fa-spinner animate-spin"></i>
-                    <span className="ml-2">Loading Suggestions...</span>
-                  </>
+                  </div>
                 ) : (
                   "No suggestions found"
                 )}
-              </p>
+              </div>
             )}
           </div>
         </div>

@@ -8,7 +8,7 @@ export default function UserProfilePage(x) {
     <>
       <div className="w-[90%] lg:w-[80%] mx-auto">
         <Link
-          to="/profile"
+          to="/feed"
           className=" bg-white text-gray-600 text-sm font-semibold p-2 rounded-lg shadow-md ms-4 flex items-center gap-2 w-fit"
         >
           <span>
