@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { $QUERY_KEYS } from "../../query-keys/queryKeys";
 import { $Services } from "../../services/services-repository";
-import { Input } from "@heroui/react";
+import { Button, Input, Tooltip } from "@heroui/react";
 import SuggestionsCard from "../../components/feed/feed-right-sidebar/SuggestionsCard";
 
 export default function SuggestionsPage() {
@@ -15,28 +15,50 @@ export default function SuggestionsPage() {
   });
 
   // Get suggested friends
-  const suggestedFriendsQuery = useQuery({
-    queryFn: () => $Services.USER_REPOSITORY.getFollowSuggestions(),
+  const suggestedFriendsQuery = useInfiniteQuery({
+    queryFn: ({ pageParam: page = 1 }) =>
+      $Services.USER_REPOSITORY.getFollowSuggestions({ page }),
     queryKey: $QUERY_KEYS.suggestionFriends,
+    getNextPageParam: (lastPage) => {
+      const nextPage = lastPage?.meta?.pagination?.nextPage ?? undefined;
+      return nextPage;
+    },
+    enabled: search.length === 0,
   });
 
   // Get search suggested friends
-  const searchSuggestedFriends = useQuery({
-    queryFn: () => $Services.USER_REPOSITORY.searchSuggestions({ q: search }),
+  const searchSuggestedFriends = useInfiniteQuery({
+    queryFn: ({ pageParam: page = 1 }) =>
+      $Services.USER_REPOSITORY.searchSuggestions({ q: search, page }),
     queryKey: [$QUERY_KEYS.searchSuggestions, search],
     enabled: search.length > 0,
+    getNextPageParam: (lastPage) => {
+      const nextPage = lastPage?.meta?.pagination?.nextPage ?? undefined;
+      return nextPage;
+    },
   });
 
   // Handle search
   const suggestions =
     search.length > 0
-      ? searchSuggestedFriends?.data?.data?.users
-      : suggestedFriendsQuery?.data?.data?.suggestions;
+      ? searchSuggestedFriends?.data?.pages?.flatMap(
+          (page) => page?.data?.suggestions,
+        )
+      : suggestedFriendsQuery?.data?.pages?.flatMap(
+          (page) => page?.data?.suggestions,
+        );
 
+  // Get next page
+  function getNextPage() {
+    if (search.length > 0) {
+      return searchSuggestedFriends.fetchNextPage();
+    }
+    return suggestedFriendsQuery.fetchNextPage();
+  }
 
   return (
     <div
-      className={`bg-gray-100 min-h-screen py-5 ${suggestedFriendsQuery.isLoading? "blur-xs" : ""} ${searchSuggestedFriends.isLoading ? "animate-pulse" : ""}`}
+      className={`bg-gray-100 min-h-screen py-5 ${suggestedFriendsQuery.isLoading ? "blur-xs" : ""} ${searchSuggestedFriends.isLoading ? "animate-pulse" : ""}`}
     >
       <div className="container ">
         <Link
@@ -57,14 +79,21 @@ export default function SuggestionsPage() {
               All Suggested Friends
             </p>
 
-            <p className="bg-gray-200 rounded-full size-7 text-xs font-bold flex items-center justify-center">
-              {suggestedFriendsQuery.isLoading ||
-              searchSuggestedFriends.isLoading ? (
-                <i className="fa-solid fa-spinner animate-spin"></i>
-              ) : (
-                suggestions?.length
-              )}
-            </p>
+            <Tooltip
+              content={`${suggestions?.length} suggestions`}
+              placement="top"
+            >
+              <p className="bg-gray-200 rounded-full size-7 p-5 text-xs font-bold flex items-center justify-center">
+                {suggestedFriendsQuery.isLoading ||
+                searchSuggestedFriends.isLoading ? (
+                  <i className="fa-solid fa-spinner animate-spin"></i>
+                ) : suggestions?.length > 999 ? (
+                  "999+"
+                ) : (
+                  suggestions?.length
+                )}
+              </p>
+            </Tooltip>
           </div>
 
           {/* Search */}
@@ -87,6 +116,28 @@ export default function SuggestionsPage() {
                     suggestions={suggestion}
                   />
                 ))}
+                {searchSuggestedFriends.hasNextPage ||
+                suggestedFriendsQuery.hasNextPage ? (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3  text-center">
+                    <Button
+                      onPress={getNextPage}
+                      variant="ghost"
+                      color="primary"
+                    >
+                      <span>Load More</span>
+                      {searchSuggestedFriends.isFetchingNextPage ||
+                        (suggestedFriendsQuery.isFetchingNextPage && (
+                          <i className="fa-solid fa-spinner animate-spin ms-3"></i>
+                        ))}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3  text-center">
+                    <p className="text-xs text-neutral-500 text-center mt-10">
+                      No more suggestions
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-xs text-neutral-500 text-center mt-10">

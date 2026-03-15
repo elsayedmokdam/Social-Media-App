@@ -6,10 +6,11 @@ import {
   ModalFooter,
   Button,
 } from "@heroui/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { $Services } from "../../services/services-repository";
 import { $Utilities } from "../../utilities/utilities-repository";
+import { $QUERY_KEYS } from "../../query-keys/queryKeys";
 
 const PrivacyList = [
   {
@@ -43,6 +44,7 @@ export default function EditPrivacyModal({
       privacy: "public",
     },
   });
+  const queryClient = useQueryClient();
 
   const privacyMutation = useMutation({
     mutationFn: ({ postId, privacy }) =>
@@ -50,6 +52,9 @@ export default function EditPrivacyModal({
     onSuccess: () => {
       $Utilities.Alerts.displaySuccess("Post privacy updated");
       isOpen && onOpenChange(false);
+      queryClient.invalidateQueries({
+        queryKey: $QUERY_KEYS.posts.all,
+      })
     },
     onError: (error) => {
       $Utilities.Alerts.displayError(error);
