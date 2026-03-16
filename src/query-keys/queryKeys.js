@@ -11,6 +11,9 @@ export const $QUERY_KEYS = {
     community: ["posts", "community"],
     userPosts: (userId) => ["posts", "userPosts", userId],
     postDetails: (postId) => ["posts", "postDetails", postId],
+    bookmark: (postId) => ["posts", "bookmark", postId],
+    delete: (postId) => ["posts", "delete", postId],
+    update: (postId) => ["posts", "update", postId],
   },
   comments: {
     all: (postId) => ["comments", "all", postId],

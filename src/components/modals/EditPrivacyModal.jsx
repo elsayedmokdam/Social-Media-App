@@ -33,28 +33,27 @@ const PrivacyList = [
   },
 ];
 
-export default function EditPrivacyModal({
-  isOpen,
-  onOpen,
-  onOpenChange,
-  postId,
-}) {
+export default function EditPrivacyModal({ isOpen, onOpenChange, postId }) {
+  const queryClient = useQueryClient();
   const { handleSubmit, register } = useForm({
     defaultValues: {
       privacy: "public",
     },
   });
-  const queryClient = useQueryClient();
 
   const privacyMutation = useMutation({
+    mutationKey: $QUERY_KEYS.posts.update(postId),
     mutationFn: ({ postId, privacy }) =>
       $Services.POSTS_REPOSITORY.updatePost(postId, { privacy }),
     onSuccess: () => {
       $Utilities.Alerts.displaySuccess("Post privacy updated");
       isOpen && onOpenChange(false);
       queryClient.invalidateQueries({
+        queryKey: $QUERY_KEYS.posts.update(postId),
+      });
+      queryClient.invalidateQueries({
         queryKey: $QUERY_KEYS.posts.all,
-      })
+      });
     },
     onError: (error) => {
       $Utilities.Alerts.displayError(error);
@@ -81,7 +80,10 @@ export default function EditPrivacyModal({
               >
                 <ModalBody>
                   {PrivacyList.map((privacy) => (
-                    <label key={privacy.key} className="flex justify-between items-center gap-2 cursor-pointer">
+                    <label
+                      key={privacy.key}
+                      className="flex justify-between items-center gap-2 cursor-pointer"
+                    >
                       <div className="flex items-center gap-2">
                         <span className="text-xl text-gray-500">
                           {privacy.icon}
