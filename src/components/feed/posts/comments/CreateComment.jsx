@@ -2,11 +2,14 @@ import CustomAvatar from "../../../shared-components/avatars/CustomAvatar";
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { $Utilities } from "../../../../utilities/utilities-repository";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { $Services } from "../../../../services/services-repository";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { $QUERY_KEYS } from "../../../../query-keys/queryKeys";
+import { useAuth } from "../../../../hooks/useAuth";
 
 export default function CreateComment({ postId, activeTab }) {
+  const { userProfile } = useAuth();
   const queryClient = useQueryClient();
   let activeQuery;
 
@@ -21,7 +24,6 @@ export default function CreateComment({ postId, activeTab }) {
   });
 
   // Create a comment
-
   const commentMutation = useMutation({
     mutationFn: (data) => {
       return $Services.COMMENTS_REPOSITORY.createComment(postId, data);
@@ -32,11 +34,13 @@ export default function CreateComment({ postId, activeTab }) {
       setShowPicker(false);
       setText("");
       $Utilities.Alerts.displaySuccess("Comment created successfully");
+      // Invalidate query key for all comments of the post
       queryClient.invalidateQueries({
-        queryKey: ["comments", postId],
+        queryKey: $QUERY_KEYS.comments.all(postId),
       });
+      // Invalidate query key for data of the post
       queryClient.invalidateQueries({
-        queryKey: [activeQuery],
+        queryKey: $QUERY_KEYS.posts.postDetails(postId),
       });
     },
     onError: (error) => {
@@ -85,27 +89,38 @@ export default function CreateComment({ postId, activeTab }) {
       break;
   }
   return (
-    <form className="mt-5" onSubmit={handleSubmit((data) => onSubmit(data))}>
-      <div className="flex items-center gap-3">
+    <form className="mt-6" onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <div className="flex gap-3">
+        {/* Avatar */}
         <div className="self-start">
-          <CustomAvatar size="w-10 h-10" />
+          <CustomAvatar
+            avatarData={{
+              name: userProfile?.name,
+              image: userProfile?.photo,
+              username: userProfile?.username,
+            }}
+            size="w-10 h-10"
+          />
         </div>
-        <div className="w-full bg-white px-7 pt-5 pb-3 rounded-3xl">
-          {
-            <textarea
-              {...register("content", {
-                onChange: (e) => {
-                  setText(e.target.value);
-                },
-              })}
-              rows="4"
-              cols="50"
-              className="w-full border-0 focus:outline-none placeholder:text-neutral-400 placeholder:text-sm"
-              placeholder="Write a comment..."
-            />
-          }
-          <div className="flex items-center  justify-between mt-3">
-            <div className="flex items-center gap-3">
+
+        {/* Comment box */}
+        <div className="flex-1 bg-white border border-neutral-200 rounded-2xl p-4 shadow-sm">
+          {/* Textarea */}
+          <textarea
+            {...register("content", {
+              onChange: (e) => setText(e.target.value),
+            })}
+            rows="3"
+            maxLength={300}
+            placeholder="Write a comment..."
+            className="w-full resize-none text-sm border-0 outline-none placeholder:text-neutral-400"
+          />
+
+          {/* Actions */}
+          <div className="flex items-center justify-between mt-3">
+            {/* Left icons */}
+            <div className="flex items-center gap-4">
+              {/* Upload image */}
               <input
                 type="file"
                 hidden
@@ -114,31 +129,42 @@ export default function CreateComment({ postId, activeTab }) {
                   onChange: handleShowImage,
                 })}
               />
+
               <label
                 htmlFor="upload-comment-image"
-                className="text-neutral-400 text-xl cursor-pointer"
+                className="text-neutral-400 hover:text-blue-500 transition cursor-pointer text-lg"
               >
                 <i className="fa-regular fa-image"></i>
               </label>
-              <div className="flex items-center gap-2 cursor-pointer relative">
+
+              {/* Emoji */}
+              <div className="relative">
                 {showPicker && (
                   <div className="absolute top-10 z-50">
                     <EmojiPicker onEmojiClick={handleEmojiSelect} />
                   </div>
                 )}
-                <label
-                  htmlFor="video"
-                  className="flex items-center gap-2"
+
+                <button
+                  type="button"
                   onClick={toggleShowPicker}
+                  className="text-orange-500 hover:scale-110 transition text-lg"
                 >
-                  <i className="fa-regular fa-face-smile text-orange-500 cursor-pointer text-xl "></i>
-                </label>
+                  <i className="fa-regular fa-face-smile"></i>
+                </button>
               </div>
             </div>
+
+            {/* Submit */}
             <button
               type="submit"
-              className={`text-xl ${text ? "text-blue-500 cursor-pointer" : "text-neutral-400  cursor-not-allowed"} `}
-              disabled={!text || commentMutation.isPending}
+              disabled={commentMutation.isPending || (!text && !showImage)}
+              className={`flex items-center justify-center size-8 rounded-full transition ${commentMutation.isPending || (!text && !showImage) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+          ${
+            text || showImage
+              ? "bg-blue-500 text-white hover:bg-blue-600"
+              : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+          }`}
             >
               {commentMutation.isPending ? (
                 <i className="fa-solid fa-spinner animate-spin"></i>
@@ -149,20 +175,27 @@ export default function CreateComment({ postId, activeTab }) {
           </div>
         </div>
       </div>
-      {
-        /* Image */
-        showImage && (
-          <div className="flex items-center gap-3 mt-5 bg-neutral-300 p-2 w-full h-70 rounded-2xl overflow-hidden relative">
-            <img src={showImage} alt="avatar" className="rounded-2xl" />
-            <span
+
+      {/* Image Preview */}
+      {showImage && (
+        <div className="mt-4 ml-13 bg-white rounded-2xl border border-neutral-200">
+          <div className=" relative max-w-sm mt-4 ml-13 bg-white rounded-2xl border border-neutral-200">
+            <img
+              src={showImage}
+              alt="preview"
+              className="rounded-xl border border-neutral-200"
+            />
+
+            <button
+              type="button"
               onClick={deleteImage}
-              className="text-white/60 cursor-pointer text-xl absolute top-3 right-4 bg-black/60   size-8 flex items-center justify-center rounded-full"
+              className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white size-7 rounded-full flex items-center justify-center cursor-pointer"
             >
-              <i className="fa-solid fa-xmark "></i>
-            </span>
+              <i className="fa-solid fa-xmark text-sm"></i>
+            </button>
           </div>
-        )
-      }
+        </div>
+      )}
     </form>
   );
 }

@@ -12,6 +12,7 @@ import PostCommentSkeleton from "../../shared-components/skeletons/PostCommentSk
 import NoComments from "./comments/NoComments";
 import CreateComment from "./comments/CreateComment";
 import { usePosts } from "../../../hooks/usePosts";
+import { $QUERY_KEYS } from "../../../query-keys/queryKeys";
 
 export default function Posts({ activeTab }) {
   const [openCommentsPostId, setOpenCommentsPostId] = useState(false);
@@ -20,7 +21,7 @@ export default function Posts({ activeTab }) {
   const postQuery = usePosts(activeTab);
   // Fetch comments for each post
   const commentQuery = useQuery({
-    queryKey: ["comments", openCommentsPostId],
+    queryKey: $QUERY_KEYS.comments.all(openCommentsPostId),
     queryFn: () =>
       $Services.COMMENTS_REPOSITORY.getPostComments(openCommentsPostId),
     enabled: !!openCommentsPostId,
@@ -44,7 +45,7 @@ export default function Posts({ activeTab }) {
       {postQuery?.data?.data?.posts?.map((post) => (
         <div
           key={post._id}
-          className={`bg-white pt-5 rounded-3xl border border-neutral-200 overflow-hidden mt-5`}
+          className={`bg-white pt-5 rounded-3xl border border-neutral-200  mt-5`}
         >
           <div className="section-padding">
             {/* Header */}
@@ -88,7 +89,7 @@ export default function Posts({ activeTab }) {
 
           {/* Top Comment */}
           {post.topComment && openCommentsPostId !== post._id && (
-            <TopComment topComment={post.topComment} />
+            <TopComment topComment={post.topComment} postId={post._id} />
           )}
 
           {/* Comments */}
@@ -125,7 +126,11 @@ export default function Posts({ activeTab }) {
                       <NoComments />
                     ) : (
                       commentQuery?.data?.data?.comments?.map((comment) => (
-                        <PostComment key={comment._id} comment={comment} />
+                        <PostComment
+                          key={comment._id}
+                          comment={comment}
+                          postId={post._id}
+                        />
                       ))
                     )}
 

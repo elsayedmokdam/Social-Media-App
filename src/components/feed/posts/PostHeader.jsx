@@ -14,7 +14,13 @@ export default function PostHeader({ postCreator = {} }) {
     <div className="flex items-center justify-between relative">
       {/* User Info */}
       <div className="flex gap-3">
-        <CustomAvatar avatarData={postCreator} />
+        <CustomAvatar
+          avatarData={{
+            name,
+            image: postCreator?.photo,
+            username: postCreator?.username,
+          }}
+        />
 
         <div className="flex flex-col gap-1">
           <Link

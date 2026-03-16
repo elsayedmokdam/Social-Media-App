@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import avatar from "../../../assets/images/avatar-generations_rpge.jpg";
 import { Divider } from "@heroui/react";
 import { $Utilities } from "../../../utilities/utilities-repository";
@@ -7,12 +7,10 @@ import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { $Services } from "../../../services/services-repository";
 import SelectPrivacyForCreatePost from "./SelectPrivacy";
-import UserMetaInfo from "../../shared-components/user/UserMetaInfo";
 import CustomAvatar from "../../shared-components/avatars/CustomAvatar";
-import { $HOOKS_REPOSITORY } from "../../../hooks/hooks_repository";
 import { useAuth } from "../../../hooks/useAuth";
 export default function CreatePost({ activeTab }) {
-  const {userProfile} = useAuth();
+  const { userProfile } = useAuth();
   const queryClient = useQueryClient();
   const [text, setText] = useState("");
   const [showImage, setShowImage] = useState(null);
@@ -65,7 +63,13 @@ export default function CreatePost({ activeTab }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Header */}
         <div className="flex items-start gap-3">
-          <CustomAvatar avatarData={userProfile} />
+          <CustomAvatar
+            avatarData={{
+              image: userProfile?.photo || avatar,
+              name: userProfile?.name,
+              username: userProfile?.username,
+            }}
+          />
 
           <div className="flex flex-col">
             <h2 className="font-semibold text-sm">{userProfile?.name}</h2>

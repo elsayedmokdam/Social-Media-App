@@ -12,8 +12,18 @@ export const $QUERY_KEYS = {
     userPosts: (userId) => ["posts", "userPosts", userId],
     postDetails: (postId) => ["posts", "postDetails", postId],
   },
+  comments: {
+    all: (postId) => ["comments", "all", postId],
+    postComments: (postId) => ["comments", "postComments", postId],
+    commentLike: (commentId, postId) => [
+      "comments",
+      "commentLike",
+      commentId,
+      postId,
+    ],
+  },
   profile: {
-    myProfile : ["profile", "myProfile"],
+    myProfile: ["profile", "myProfile"],
     userProfile: (userId) => ["profile", "userProfile", userId],
   },
   suggestionFriends: ["suggested-friends"],

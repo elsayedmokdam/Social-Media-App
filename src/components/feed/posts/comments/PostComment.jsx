@@ -1,12 +1,10 @@
-import { $Utilities } from "../../../../utilities/utilities-repository";
-import Avatar from "../../../../assets/images/avatar-generations_rpge.jpg";
-import ThumbsUp from "../../../shared-components/buttons/ThumbsUp";
 import CommentHeader from "./CommentHeader";
 import CommentActions from "./CommentActions";
+
 export default function PostComment({ comment }) {
   return (
-    <>
-      {/* comment header & content*/}
+    <div className="mb-6">
+      {/* comment header & content */}
       <CommentHeader
         headerData={{
           commentCreator: {
@@ -18,15 +16,31 @@ export default function PostComment({ comment }) {
           },
         }}
       />
-      {/* comment Actions */}
-      <div className="container flex items-center justify-between gap-3 mb-5">
-        <CommentActions
-          commentActionsData={{
-            likes: comment?.likes,
-            createdAt: comment?.createdAt,
-          }}
-        />
+
+      <div className="container">
+        {/* Comment Image */}
+        {comment?.image && comment?.image !== "undefined" && (
+          <div className="mt-2 ml-6">
+            <img
+              src={comment.image}
+              alt="comment"
+              className="rounded-xl border border-neutral-200 max-w-xs"
+            />
+          </div>
+        )}
+
+        {/* comment Actions */}
+        <div className="flex items-center justify-between gap-3 mt-2 ml-6">
+          <CommentActions
+            commentActionsData={{
+              likes: comment?.likes,
+              commentId: comment?._id,
+              postId: comment?.post,
+              createdAt: comment?.createdAt,
+            }}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }

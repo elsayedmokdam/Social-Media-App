@@ -27,8 +27,8 @@ export default function PostActions({ postActions }) {
 
   // Toggle Post Likes
   function togglePostLikes() {
-    postLikeMutation.mutate(postActions.postId);
     setIsLiked((prev) => !prev);
+    postLikeMutation.mutate(postActions.postId);
   }
 
   function togglePostShare() {
@@ -42,15 +42,13 @@ export default function PostActions({ postActions }) {
           className="hover:bg-gray-100  transition-background duration-200 p-2 rounded-md text-center cursor-pointer flex items-center justify-center gap-2"
         >
           <span
-            className={`${isLikedByMe || isLiked ? "text-blue-500" : "text-neutral-500"} rounded-full`}
+            className={`${isLiked ? "text-blue-500" : "text-neutral-500"} rounded-full`}
           >
-            <i className="fa-regular fa-thumbs-up"></i>
+            <i
+              className={`fa-${isLiked ? "solid" : "regular"} fa-thumbs-up`}
+            ></i>
           </span>
-          <span
-            className={
-              isLikedByMe || isLiked ? "text-blue-500" : "text-neutral-500"
-            }
-          >
+          <span className={isLiked ? "text-blue-500" : "text-neutral-500"}>
             Like
           </span>
         </div>
