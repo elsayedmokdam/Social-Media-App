@@ -50,15 +50,25 @@ export default function FeedRightSideBar() {
           </span>
           <span>Suggested Friends</span>
         </p>
-        <p className="bg-gray-200 rounded-full size-5 p-2 text-xs font-bold flex justify-center items-center">
-          {suggestedFriendsQuery?.isLoading ||
-          searchSuggestedFriends?.isLoading ? (
-            <i className="fa-solid fa-spinner animate-spin"></i>
-          ) : (
-            suggestions?.length
-          )}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="bg-gray-200 rounded-full size-5 p-2 text-xs font-bold flex justify-center items-center">
+            {suggestedFriendsQuery?.isLoading ||
+            searchSuggestedFriends?.isLoading ? (
+              <i className="fa-solid fa-spinner animate-spin"></i>
+            ) : (
+              suggestions?.length
+            )}
+          </p>
+          {/* Arrow */}
+          <span className="block xl:hidden">
+            <i
+              className={`fa-solid fa-chevron-down transition-transform duration-300 
+            ${isOpenSuggestions ? "rotate-180" : ""} xl:rotate-0`}
+            />
+          </span>
+        </div>
       </div>
+      {/* Search */}
       <Input
         {...register("search")}
         onClear={() => setSearch("")}

@@ -8,9 +8,12 @@ import {
   Dropdown,
   DropdownMenu,
   Avatar,
+  AvatarGroup,
 } from "@heroui/react";
 import { Link, NavLink } from "react-router";
 import avatarFallback from "../../assets/images/avatar-generations_rpge.jpg";
+import routeLogo from "../../assets/images/Route.jpg";
+import me from "../../assets/images/me.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { $Services } from "../../services/services-repository";
 import { $QUERY_KEYS } from "../../query-keys/queryKeys";
@@ -51,14 +54,18 @@ export default function MainNavBar() {
     <Navbar isBordered variant="floating" className="bg-white py-2 shadow-sm">
       {/* Brand */}
       <NavbarBrand>
-        <p className="font-bold text-sm lg:text-lg">
-          <span className="bg-linear-to-r from-indigo-600 via-indigo-500 to-blue-400 bg-clip-text text-transparent">
-            Social
-          </span>
-          <span className="bg-linear-to-r from-indigo-700 via-indigo-600 to-blue-500 bg-clip-text text-transparent">
-            App
-          </span>
-        </p>
+        <AvatarGroup>
+          <Avatar
+            src={me}
+            alt="avatar"
+            size="md"
+          />
+          <Avatar
+            src={routeLogo}
+            alt="avatar"
+            size="md"
+          />
+        </AvatarGroup>
       </NavbarBrand>
 
       {/* Center nav items */}

@@ -15,22 +15,20 @@ export default function FollowersFollowingModal({
   const queryClient = useQueryClient();
   const [loadingUser, setLoadingUser] = useState(null);
 
-  // Tracks ids optimistically removed (unfollowed in "following" view)
   const removedIdsRef = useRef(new Set());
-
-  // Tracks follow-back toggles in "followers" view for instant UI feedback
   const [optimisticFollowed, setOptimisticFollowed] = useState(new Set());
   const [optimisticUnfollowed, setOptimisticUnfollowed] = useState(new Set());
 
   const prevFollowTypeRef = useRef(null);
 
-  // Reset all optimistic state when followType identity changes (modal reopens)
-  if (prevFollowTypeRef.current !== followType) {
-    prevFollowTypeRef.current = followType;
+  // ✅ FIX: reset only when type changes
+  if (prevFollowTypeRef.current !== followType?.type) {
+    prevFollowTypeRef.current = followType?.type;
     removedIdsRef.current = new Set();
+    setOptimisticFollowed(new Set());
+    setOptimisticUnfollowed(new Set());
   }
 
-  // Derive id list from prop, minus optimistically removed ones
   const ids = (followType?.ids ?? []).filter(
     (id) => !removedIdsRef.current.has(id),
   );
@@ -54,16 +52,13 @@ export default function FollowersFollowingModal({
       setLoadingUser(id);
 
       if (followType?.type === "following") {
-        // Optimistically remove from the following list
         removedIdsRef.current = new Set([...removedIdsRef.current, id]);
       } else {
-        // Followers view — toggle follow-back state optimistically
         const isCurrentlyFollowingBack =
           optimisticFollowed.has(id) ||
           (!optimisticUnfollowed.has(id) && myProfile?.following?.includes(id));
 
         if (isCurrentlyFollowingBack) {
-          // Unfollow: remove from followed set, add to unfollowed set
           setOptimisticFollowed((prev) => {
             const next = new Set(prev);
             next.delete(id);
@@ -71,7 +66,6 @@ export default function FollowersFollowingModal({
           });
           setOptimisticUnfollowed((prev) => new Set([...prev, id]));
         } else {
-          // Follow: remove from unfollowed set, add to followed set
           setOptimisticUnfollowed((prev) => {
             const next = new Set(prev);
             next.delete(id);
@@ -90,7 +84,6 @@ export default function FollowersFollowingModal({
     },
 
     onError: (_, id) => {
-      // Rollback optimistic changes on failure
       if (followType?.type === "following") {
         removedIdsRef.current = new Set(
           [...removedIdsRef.current].filter((uid) => uid !== id),
@@ -125,10 +118,8 @@ export default function FollowersFollowingModal({
     let isCurrentlyFollowing;
 
     if (isFollowingView) {
-      // Every visible user in the following view is followed (removed ones are gone)
       isCurrentlyFollowing = true;
     } else {
-      // Check optimistic overrides first, then fall back to real profile data
       if (optimisticFollowed.has(userId)) {
         isCurrentlyFollowing = true;
       } else if (optimisticUnfollowed.has(userId)) {
@@ -140,18 +131,16 @@ export default function FollowersFollowingModal({
 
     if (isCurrentlyFollowing) {
       return {
-        label: "Unfollow",
-        icon: "fa-user-minus",
-        className:
-          "text-rose-500 border-rose-200 hover:bg-rose-50 active:bg-rose-100",
+        label: "Following",
+        icon: "fa-check",
+        className: "text-neutral-600 border-neutral-300 hover:bg-neutral-100",
       };
     }
 
     return {
       label: "Follow",
       icon: "fa-user-plus",
-      className:
-        "text-blue-500 border-blue-200 hover:bg-blue-50 active:bg-blue-100",
+      className: "text-blue-500 border-blue-200 hover:bg-blue-50",
     };
   }
 
@@ -165,15 +154,18 @@ export default function FollowersFollowingModal({
     >
       <ModalContent>
         <>
-          <ModalHeader className="flex flex-col gap-1">#{title}</ModalHeader>
+          {/* Header */}
+          <ModalHeader className="text-lg font-bold  pb-3">
+            {title}
+          </ModalHeader>
 
           <ModalBody>
             {followersListQuery.pending ? (
-              <div className="flex justify-center py-6">
-                <i className="fa-solid fa-spinner animate-spin text-lg" />
+              <div className="flex justify-center py-10">
+                <i className="fa-solid fa-spinner animate-spin text-xl text-neutral-500" />
               </div>
             ) : followersListQuery.data?.length ? (
-              <ul className="flex flex-col gap-4 pb-3">
+              <ul className="flex flex-col gap-3 pb-3">
                 {followersListQuery.data.map((user) => {
                   const id = user?.user?._id;
                   if (!id) return null;
@@ -184,23 +176,40 @@ export default function FollowersFollowingModal({
                   return (
                     <li
                       key={id}
-                      className="flex items-center justify-between gap-4 shadow-sm p-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 transition"
+                      className="flex items-center justify-between gap-3 p-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 transition"
                     >
+                      {/* User */}
                       <Link
                         to={`/profile/${id}`}
-                        className="flex items-center gap-4 min-w-0"
+                        className="flex items-center gap-3 min-w-0"
                         onClick={() => onOpenChange(false)}
                       >
-                        <CustomAvatar avatarData={user?.user} size="h-9 w-9" />
-                        <span className="font-semibold text-sm text-neutral-700 capitalize truncate">
-                          {user?.user?.name}
-                        </span>
+                        <CustomAvatar
+                          avatarData={{
+                            image: user?.user?.photo,
+                            name: user?.user?.name,
+                            username: user?.user?.username,
+                          }}
+                          size="h-10 w-10"
+                        />
+
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-semibold text-sm text-neutral-800 truncate hover:underline">
+                            {user?.user?.name}
+                          </span>
+                          {user?.user?.username && (
+                            <span className="text-xs text-neutral-400 truncate">
+                              @{user?.user?.username}
+                            </span>
+                          )}
+                        </div>
                       </Link>
 
+                      {/* Button */}
                       <button
-                        disabled={isLoading || followMutation.isPending}
+                        disabled={isLoading}
                         onClick={() => handleFollowToggle(id)}
-                        className={`flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-lg border transition shrink-0 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+                        className={`flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-lg border transition shrink-0 disabled:opacity-50 cursor-pointer ${className}`}
                       >
                         {isLoading ? (
                           <i className="fa-solid fa-spinner animate-spin" />
@@ -214,7 +223,7 @@ export default function FollowersFollowingModal({
                 })}
               </ul>
             ) : (
-              <div className="text-center text-sm text-neutral-500 py-6">
+              <div className="text-center text-sm text-neutral-500 py-10">
                 No {title.toLowerCase()} yet
               </div>
             )}
