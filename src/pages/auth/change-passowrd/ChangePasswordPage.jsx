@@ -37,7 +37,6 @@ import { $Services } from "../../../services/services-repository";
 
   function changePassword(payload) {
     changePasswordMutation.mutate(payload);
-    // console.log(payload);
   }
 
   return (

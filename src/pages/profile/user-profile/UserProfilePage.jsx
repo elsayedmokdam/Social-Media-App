@@ -3,7 +3,6 @@ import UserProfileBody from "../../../components/user-profile/user-profile-body/
 import UserProfileHeader from "../../../components/user-profile/user-profile-header/UserProfileHeader";
 
 export default function UserProfilePage(x) {
-  console.log(x);
   return (
     <>
       <div className="w-[90%] lg:w-[80%] mx-auto">

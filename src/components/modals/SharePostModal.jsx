@@ -41,8 +41,6 @@ export default function SharePostModal({
 
 
   function sharePost(data) {
-    console.log("data", data.postDescription);
-    console.log("postId", postId);
     postShareMutation.mutate({ postId, content: data.postDescription });
   }
 

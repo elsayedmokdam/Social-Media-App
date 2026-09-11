@@ -222,8 +222,8 @@ export default function Signin() {
                 errorMessage={errors.email?.message}
                 label="Email Addrees"
                 labelPlacement="outside"
-                autoComplete="new-email"
-                placeholder="name@example.com"
+                autoComplete="on"
+                placeholder="enter: sayed.route12@gmail.com, an existing account for test"
                 type="email"
                 startContent={
                   <i className="fa-solid fa-envelope text-default-400"></i>
@@ -245,7 +245,7 @@ export default function Signin() {
                 label="Password"
                 labelPlacement="outside"
                 autoComplete="off"
-                placeholder="Create a strong password"
+                placeholder="for test, enter: Sayed#123"
                 type="password"
                 startContent={
                   <i className="fa-solid fa-lock text-default-400"></i>

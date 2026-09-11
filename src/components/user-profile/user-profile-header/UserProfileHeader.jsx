@@ -43,7 +43,7 @@ export default function UserProfileHeader() {
 
   return (
     <>
-    <title>{userProfileQuery?.data?.data?.user?.name}</title>
+      <title>{userProfileQuery?.data?.data?.user?.name}</title>
       {openViewerImage && (
         <ImageInFullScreen
           openViewerImage={openViewerImage}

@@ -36,7 +36,7 @@ export default function AuthContextProvider({ children }) {
       } catch (err) {
         logout();
         $Utilities.Alerts.displayError(
-          new Error("An Error occurred while fetching user profile.", {
+          new Error("Session expired. Please login again", {
             cause: err,
           }),
         );

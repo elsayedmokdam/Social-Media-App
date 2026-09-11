@@ -53,7 +53,6 @@ export default function EditPost({ postId, userId, isBookmarked }) {
     mutationFn: (postId) =>
       $Services.POSTS_REPOSITORY.bookmarkAndUnbookmarkPost(postId),
     onSuccess: (data) => {
-      console.log(data);
       $Utilities.Alerts.displaySuccess(
         `${data.data.bookmarked ? "Bookmarked" : "Unbookmarked"} successfully`,
       );

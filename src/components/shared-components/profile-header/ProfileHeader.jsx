@@ -32,10 +32,8 @@ export default function ProfileHeader({ myPostsQuery, myBookmarksQuery }) {
   const myPostsLength = myPostsQuery?.data?.pages[0]?.meta?.pagination?.total;
   const myBookmarksLength =
     myBookmarksQuery?.data?.pages[0]?.meta?.pagination?.total;
-  const myFollowersIds = myProfileQuery?.data?.data?.user?.followers;
-  const myFollowingIds = myProfileQuery?.data?.data?.user?.following;
-  console.log("myFollowingIds", myFollowingIds);
-  console.log("myFollowersIds", myFollowersIds);
+  const myFollowersIds = myProfileQuery?.data?.data?.user?.followers ?? [];
+  const myFollowingIds = myProfileQuery?.data?.data?.user?.following ?? [];
   // Upload profile photo
   const changeMyProfilePhotoMutation = useMutation({
     mutationFn: (imageFile) =>
@@ -68,7 +66,6 @@ export default function ProfileHeader({ myPostsQuery, myBookmarksQuery }) {
 
   function handleChangeMyProfilePhoto(e) {
     const file = e.target.files[0];
-    console.log(file);
     if (!file) return;
 
     changeMyProfilePhotoMutation.mutate(file);
@@ -102,10 +99,7 @@ export default function ProfileHeader({ myPostsQuery, myBookmarksQuery }) {
     const value = item.toLowerCase();
 
     if (value === "followers" || value === "following") {
-      setFollowType({
-        type: value,
-        ids: value === "followers" ? myFollowersIds : myFollowingIds,
-      });
+      setFollowType(value);
       onOpenFollowers();
     }
   }
@@ -327,10 +321,13 @@ export default function ProfileHeader({ myPostsQuery, myBookmarksQuery }) {
       {/* FOLLOWERS MODAL */}
       {followType && (
         <FollowersFollowingModal
-          onOpen={onOpenFollowers}
           isOpen={isOpenFollowers}
           onOpenChange={onOpenChangeFollowers}
-          followType={followType}
+          followType={{
+            type: followType,
+            ids: followType === "followers" ? myFollowersIds : myFollowingIds,
+          }}
+          myProfile={myProfileQuery?.data?.data?.user}
         />
       )}
     </>

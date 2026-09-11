@@ -61,8 +61,6 @@ export default function EditPrivacyModal({ isOpen, onOpenChange, postId }) {
     },
   });
   function handlePrivacy(data) {
-    console.log("data", data);
-    console.log("postId", postId);
     privacyMutation.mutate({ postId, privacy: data.privacy });
   }
   return (

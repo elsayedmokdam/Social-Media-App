@@ -21,7 +21,7 @@ export default function FollowersFollowingModal({
 
   const prevFollowTypeRef = useRef(null);
 
-  // ✅ FIX: reset only when type changes
+  // reset only when type changes
   if (prevFollowTypeRef.current !== followType?.type) {
     prevFollowTypeRef.current = followType?.type;
     removedIdsRef.current = new Set();
@@ -76,12 +76,15 @@ export default function FollowersFollowingModal({
       }
     },
 
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({
-        queryKey: $QUERY_KEYS.profile.myProfile,
-      });
-      queryClient.invalidateQueries({ queryKey: ["user", id] });
-    },
+    onSuccess: async (_, id) => {
+  await queryClient.refetchQueries({
+    queryKey: $QUERY_KEYS.profile.myProfile,
+  });
+
+  await queryClient.invalidateQueries({
+    queryKey: ["user", id],
+  });
+},
 
     onError: (_, id) => {
       if (followType?.type === "following") {
@@ -92,7 +95,7 @@ export default function FollowersFollowingModal({
         setOptimisticFollowed((prev) => {
           const next = new Set(prev);
           next.delete(id);
-          return next;
+          return next;  
         });
         setOptimisticUnfollowed((prev) => {
           const next = new Set(prev);

@@ -5,7 +5,6 @@ import { $Utilities } from "../../../utilities/utilities-repository";
 
 export default function UserMetaInfo({ postCreator }) {
   const formatDate = $Utilities.Dates.displayRelativeTime;
-  console.log(postCreator);
   return (
     <div className="flex items-center gap-3 ">
       <Link to={`/profile/${postCreator?._id}`}>

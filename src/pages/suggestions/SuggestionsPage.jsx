@@ -9,7 +9,6 @@ import SuggestionsCard from "../../components/feed/feed-right-sidebar/Suggestion
 
 export default function SuggestionsPage() {
   const {state} = useLocation();
-  console.log("state", state);
 
   const [search, setSearch] = useState(state?.search || "");
 

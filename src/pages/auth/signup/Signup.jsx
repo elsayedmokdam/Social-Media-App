@@ -242,7 +242,7 @@ export default function Signup() {
               errorMessage={errors.name?.message}
               label="Full Name"
               labelPlacement="outside"
-              autoComplete="off"
+              autoComplete="on"
               placeholder="Enter your full name"
               type="text"
               startContent={
